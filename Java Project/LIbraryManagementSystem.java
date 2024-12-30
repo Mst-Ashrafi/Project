@@ -46,7 +46,6 @@ abstract class Borrowable {
 
 // Book class extending Borrowable
 class Book extends Borrowable {
-
     public Book(int id, String title, String author) {
         super(id, title, author);
     }
@@ -97,6 +96,36 @@ class EBook extends Borrowable {
     }
 }
 
+// Magazine class extending Borrowable
+class Magazine extends Borrowable {
+    private String issueDate;
+
+    public Magazine(int id, String title, String author, String issueDate) {
+        super(id, title, author);
+        this.issueDate = issueDate;
+    }
+
+    @Override
+    public void borrow(String studentId) {
+        this.isBorrowed = true;
+        this.borrowedBy = studentId;
+        this.borrowedDate = new Date(); // Set current date as borrowed date
+    }
+
+    @Override
+    public void returnBook() {
+        this.isBorrowed = false;
+        this.borrowedBy = null;
+        this.borrowedDate = null;
+        this.fine = 0; // Reset fine on return
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", Issue Date: " + issueDate;
+    }
+}
+
 // Library class
 class Library {
     private Map<Integer, Borrowable> borrowables = new HashMap<>();
@@ -112,6 +141,12 @@ class Library {
         EBook newEBook = new EBook(nextBookId++, title, author, fileFormat);
         borrowables.put(newEBook.id, newEBook);
         System.out.println("EBook added successfully: " + newEBook);
+    }
+
+    public void addMagazine(String title, String author, String issueDate) {
+        Magazine newMagazine = new Magazine(nextBookId++, title, author, issueDate);
+        borrowables.put(newMagazine.id, newMagazine);
+        System.out.println("Magazine added successfully: " + newMagazine);
     }
 
     public void removeBorrowable(int id) {
@@ -164,7 +199,7 @@ class Library {
 }
 
 // Main class
- class LibraryManagementSystem {
+public class LibraryManagementSystem {
     private static Map<String, String> admins = new HashMap<>();
     private static Library library = new Library();
     private static Scanner scanner = new Scanner(System.in);
@@ -236,11 +271,12 @@ class Library {
             System.out.println("\nAdmin Menu");
             System.out.println("1. Add Book");
             System.out.println("2. Add EBook");
-            System.out.println("3. Remove Borrowable");
-            System.out.println("4. Borrow Borrowable");
-            System.out.println("5. Return Borrowable");
-            System.out.println("6. View All Borrowables");
-            System.out.println("7. Logout");
+            System.out.println("3. Add Magazine");
+            System.out.println("4. Remove Borrowable");
+            System.out.println("5. Borrow Borrowable");
+            System.out.println("6. Return Borrowable");
+            System.out.println("7. View All Borrowables");
+            System.out.println("8. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -263,11 +299,20 @@ class Library {
                     library.addEBook(eBookTitle, eBookAuthor, fileFormat);
                     break;
                 case 3:
+                    System.out.print("Enter magazine title: ");
+                    String magTitle = scanner.nextLine();
+                    System.out.print("Enter magazine author: ");
+                    String magAuthor = scanner.nextLine();
+                    System.out.print("Enter issue date: ");
+                    String issueDate = scanner.nextLine();
+                    library.addMagazine(magTitle, magAuthor, issueDate);
+                    break;
+                case 4:
                     System.out.print("Enter borrowable ID to remove: ");
                     int removeId = scanner.nextInt();
                     library.removeBorrowable(removeId);
                     break;
-                case 4:
+                case 5:
                     System.out.print("Enter borrowable ID to borrow: ");
                     int borrowId = scanner.nextInt();
                     scanner.nextLine();
@@ -275,15 +320,15 @@ class Library {
                     String studentId = scanner.nextLine();
                     library.borrowBorrowable(borrowId, studentId);
                     break;
-                case 5:
+                case 6:
                     System.out.print("Enter borrowable ID to return: ");
                     int returnId = scanner.nextInt();
                     library.returnBorrowable(returnId);
                     break;
-                case 6:
+                case 7:
                     library.viewBorrowables();
                     break;
-                case 7:
+                case 8:
                     System.out.println("Logging out.");
                     return;
                 default:
